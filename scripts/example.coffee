@@ -10,9 +10,9 @@
 
 module.exports = (robot) ->
   botname = process.env.HUBOT_SLACK_BOTNAME
-  plusplus_re = /@([a-z0-9_\-\.]+)\+{2,}/ig
-  minusminus_re = /@([a-z0-9_\-\.]+)\-{2,}/ig
-  plusplus_minusminus_re = /@([a-z0-9_\-\.]+)[\+\-]{2,}/ig
+  plusplus_re = /@([a-z0-9_\-\.]+)(?::\s+)?\+{2,}/ig
+  minusminus_re = /@([a-z0-9_\-\.]+)(?::\s+)?\-{2,}/ig
+  plusplus_minusminus_re = /@([a-z0-9_\-\.]+)(?::\s+)?[\+\-]{2,}/ig
   
   robot.hear plusplus_minusminus_re, (msg) ->
      sending_user = msg.message.user.name
@@ -32,7 +32,7 @@ module.exports = (robot) ->
          res += "@#{user}-- [ouch! now at #{count}]\n"
      msg.send res.replace(/\s+$/g, '')
 
-  robot.hear /// #{botname} \s+ @([a-z0-9_\-\.]+) ///i, (msg) ->
+  robot.hear /// #{botname}:?\s+ @([a-z0-9_\-\.]+) ///i, (msg) ->
      user = msg.match[1].replace(/\-+$/g, '')
      count = robot.brain.get(user)
      if count != null
@@ -41,7 +41,7 @@ module.exports = (robot) ->
      else
          msg.send "@#{user} has no karma"
 
-  robot.hear /// #{botname} \s+ leaderboard ///i, (msg) ->
+  robot.hear /// #{botname}:?(\s+leaderboard)?\s*$ ///i, (msg) ->
      users = robot.brain.data._private
      tuples = []
      for username, score of users
